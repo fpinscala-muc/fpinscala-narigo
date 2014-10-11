@@ -96,7 +96,7 @@ object MonomorphicBinarySearch {
       else {
         val mid2 = (low + high) / 2
         val d = ds(mid2) // We index into an array using the same
-                         // syntax as function application
+        // syntax as function application
         if (d == key) mid2
         else if (d > key) go(low, mid2, mid2-1)
         else go(mid2 + 1, mid2, high)
