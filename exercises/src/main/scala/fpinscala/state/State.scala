@@ -93,6 +93,23 @@ object RNG {
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
     fs.foldRight[Rand[List[A]]](unit(Nil))((ra, rList) => map2(ra, rList)(_ :: _))
 
+  def sequence2[A](fs: List[Rand[A]]): Rand[List[A]] = { rng =>
+    val (a: List[A], rng2: RNG) = ???
+    (a, rng2)
+  }
+
+  // Wenn Rand[A] ein State[RNG, A] wäre und wir map/flatMap in dem Typ hätten, ginge das:
+  //  def sequence3[A](fs: List[Rand[A]]): Rand[List[A]] = {
+  //    fs.foldRight(unit(List[A]())) {
+  //      (ra, rla) => for {
+  //        a: A <- ra
+  //        la: List[A] <- rla
+  //      } yield (a :: la)
+  //    }
+  //  }
+
+  //    fs.foldRight[Rand[List[A]]](unit(Nil))((ra, rList) => map2(ra, rList)(_ :: _))
+
   def intsViaSequence(count: Int): Rand[List[Int]] = sequence(List.fill(count)(int))
 
   def flatMap[A, B](f: Rand[A])(g: A => Rand[B]): Rand[B] = { rng0 =>
@@ -145,15 +162,15 @@ object State {
   def sequence[S, A](sas: List[State[S, A]]): State[S, List[A]] =
     sas.foldRight[State[S, List[A]]](unit(Nil))((sa, sList) => sa.map2(sList)(_ :: _))
 
-  import fpinscala.applicative.StateUtil._ // imports get and set
+  // imports get and set
+  import fpinscala.applicative.StateUtil._
 
   def modify[S](f: S => S): State[S, Unit] = for {
     s <- get
     _ <- set(f(s))
   } yield ()
 
-  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] =
-    for {
+  def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
     _ <- sequence {
       val l = inputs.map(input => modify[Machine](machine => (input, machine) match {
         case (_, m@Machine(_, 0, _)) => println("empty machine"); m
