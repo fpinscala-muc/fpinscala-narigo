@@ -127,14 +127,16 @@ trait Stream[+A] {
   }.append(Stream(empty))
 
   def scanRight[B](s: B)(f: (A, B) => B): Stream[B] =
-    foldRight((Stream(s), s)) { (elem, resultAndState) =>
-      val next = f(elem, resultAndState._2)
-      (Stream.cons(next, resultAndState._1), next)
+    foldRight((Stream(s), s)) {
+      case (elem, (result, stream)) =>
+        val next = f(elem, stream)
+        (Stream.cons(next, result), next)
     }._1
 
 }
 
 case object Empty extends Stream[Nothing]
+
 case class Cons[+A](h: () => A, t: () => Stream[A]) extends Stream[A]
 
 object Stream {
