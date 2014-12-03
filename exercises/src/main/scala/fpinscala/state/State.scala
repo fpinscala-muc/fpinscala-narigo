@@ -173,11 +173,11 @@ object State {
   def simulateMachine(inputs: List[Input]): State[Machine, (Int, Int)] = for {
     _ <- sequence {
       val l = inputs.map(input => modify[Machine](machine => (input, machine) match {
-        case (_, m@Machine(_, 0, _)) => println("empty machine"); m
-        case (Turn, m@Machine(true, _, _)) => println("turn on locked machine"); m
-        case (Coin, m@Machine(false, _, _)) => println("coin on unlocked machine"); m
-        case (Coin, Machine(true, candies, coins)) => println("inserted coin -> unlocked"); Machine(locked = false, candies, coins + 1)
-        case (Turn, Machine(false, candies, coins)) => println("turned unlocked machine -> candy dispensed"); Machine(locked = true, candies - 1, coins)
+        case (_, m@Machine(_, 0, _)) => m
+        case (Turn, m@Machine(true, _, _)) => m
+        case (Coin, m@Machine(false, _, _)) => m
+        case (Coin, Machine(true, candies, coins)) => Machine(locked = false, candies, coins + 1)
+        case (Turn, Machine(false, candies, coins)) => Machine(locked = true, candies - 1, coins)
       }))
       l
     }
