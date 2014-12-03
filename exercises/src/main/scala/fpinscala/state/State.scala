@@ -93,10 +93,10 @@ object RNG {
   def sequence[A](fs: List[Rand[A]]): Rand[List[A]] =
     fs.foldRight[Rand[List[A]]](unit(Nil))((ra, rList) => map2(ra, rList)(_ :: _))
 
-  def sequence2[A](fs: List[Rand[A]]): Rand[List[A]] = { rng =>
-    val (a: List[A], rng2: RNG) = ???
-    (a, rng2)
-  }
+//  def sequence2[A](fs: List[Rand[A]]): Rand[List[A]] = { rng =>
+//    val (a: List[A], rng2: RNG) = ???
+//    (a, rng2)
+//  }
 
   // Wenn Rand[A] ein State[RNG, A] wäre und wir map/flatMap in dem Typ hätten, ginge das:
   //  def sequence3[A](fs: List[Rand[A]]): Rand[List[A]] = {
