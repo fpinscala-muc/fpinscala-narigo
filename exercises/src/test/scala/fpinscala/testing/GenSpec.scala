@@ -42,7 +42,9 @@ class GenSpec extends FlatSpec with PropertyChecks with BeforeAndAfterEach {
     val ints = SCGen.choose(0, 100)
     val intList = SCGen.listOf(ints)
     val prop: SCProp =
-      SCProp.forAll(intList) { l: List[Int] => ???}
+      SCProp.forAll(intList) { l: List[Int] =>
+        l.sum == l.reverse.sum
+      }
     checkProp(prop)
   }
 
@@ -51,7 +53,10 @@ class GenSpec extends FlatSpec with PropertyChecks with BeforeAndAfterEach {
     val ints = SCGen.choose(0, 100)
     val intList = SCGen.listOf1(ints)
     val prop: SCProp =
-      SCProp.forAll(intList) { l: List[Int] => ??? }
+      SCProp.forAll(intList) { l: List[Int] =>
+        val max = l.max
+        !l.exists(_ > max)
+      }
     checkProp(prop)
   }
 
