@@ -20,7 +20,7 @@ trait Parsers[Parser[+_]] { self => // so inner classes may call methods of trai
     ???
 
   def many[A](p: Parser[A]): Parser[List[A]] = // 152, 155
-    ???
+    map2(p, many(p))((a, b) => a :: b) or succeed(List())
 
   def map[A,B](a: Parser[A])(f: A => B): Parser[B] = // 152
     ???
@@ -39,7 +39,7 @@ trait Parsers[Parser[+_]] { self => // so inner classes may call methods of trai
     ???
 
   def map2[A,B,C](p: Parser[A], p2: => Parser[B])(f: (A,B) => C): Parser[C] = // 157
-    ???
+    p.product(p2).map(t => f(t._1, t._2))
 
   def flatMap[A,B](p: Parser[A])(f: A => Parser[B]): Parser[B] // 157
 
@@ -63,11 +63,20 @@ trait Parsers[Parser[+_]] { self => // so inner classes may call methods of trai
   }
 
   object Laws {
+    def charLaw(c: Char) = run(char(c))(c.toString) == Right(c)
+
+    def stringLaw(s: String) = run(string(s))(s) == Right(s)
+
+    def orLeftLaw(s1: String, s2: String) =
+      run(or(string(s1), string(s2)))(s1) == Right(s1)
+
+    def orRightLaw(s1: String, s2: String) =
+      run(or(string(s1), string(s2)))(s2) == Right(s2)
   }
 
   object Exercises {
     def map2ViaProduct[A,B,C](p: Parser[A], p2: => Parser[B])(f: (A,B) => C): Parser[C] = // 154
-      ???
+      p.product(p2).map(t => f(t._1, t._2))
 
     def csListOfN[A](p: Parser[A]): Parser[List[A]] = // 157
       ???
@@ -86,7 +95,7 @@ case class Location(input: String, offset: Int = 0) {
   def advanceBy(n: Int) = copy(offset = offset+n)
 
   /* Returns the line corresponding to this location */
-  def currentLine: String = 
+  def currentLine: String =
     if (input.length > 1) input.lines.drop(line-1).next
     else ""
 }
