@@ -17,7 +17,9 @@ trait Parsers[Parser[+_]] { self => // so inner classes may call methods of trai
     ParserOps(f(a))
 
   def listOfN[A](n: Int, p: Parser[A]): Parser[List[A]] = // 150, 155
-    ???
+    if (n > 0) {
+      map2(p, listOfN(n-1, p))(_ :: _)
+    } else succeed(List())
 
   def many[A](p: Parser[A]): Parser[List[A]] = // 152, 155
     map2(p, many(p))((a, b) => a :: b) or succeed(List())
@@ -79,7 +81,11 @@ trait Parsers[Parser[+_]] { self => // so inner classes may call methods of trai
       p.product(p2).map(t => f(t._1, t._2))
 
     def csListOfN[A](p: Parser[A]): Parser[List[A]] = // 157
-      ???
+      for {
+        digit <- "[0-9]+".r
+        n <- succeed(Integer.parseInt(digit))
+        x <- listOfN(n, p)
+      } yield x
   }
 }
 
